@@ -20,7 +20,7 @@ router.post('/:id/notes', authenticate(['doctor']), addPatientNotes);
 router.get('/doctor-prescriptions', authenticate(['doctor']), getDoctorPrescriptions);
 
 // Route to get all doctors
-router.get('/doctors', getAllDoctors);
+router.get('/all-doctors', getAllDoctors);
 
 // Route to get a doctor by ID
 router.get('/doctors/:id', getDoctorById);
