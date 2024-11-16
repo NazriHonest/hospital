@@ -120,7 +120,7 @@ export async function getDoctorPrescriptions(req, res) {
 }
 
 // Get all doctors
-const getAllDoctors = async (req, res) => {
+export async function getAllDoctors(req, res){
     try {
         const doctors = await Doctor.find();
         res.status(200).json(doctors);
@@ -130,7 +130,7 @@ const getAllDoctors = async (req, res) => {
 };
 
 // Get doctor by ID
-const getDoctorById = async (req, res) => {
+export async function getDoctorById(req, res){
     try {
         const doctor = await Doctor.findById(req.params.id);
         if (!doctor) {
