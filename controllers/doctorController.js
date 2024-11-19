@@ -54,24 +54,46 @@ export async function registerDoctor(req, res){
     }
 };
 
+// export async function getDoctorDashboard(req, res) {
+//     try {
+//         // Use req.user._id since the doctor is authenticated, and we attach the user to the request
+//         const doctor = await Doctor.findOne({user: req.user._id}).populate('patients');
+
+//         if (!doctor) {
+//             return res.status(404).json({ message: "Doctor not found" });
+//         }
+
+//         // Find all patients assigned to this doctor (assuming you have 'assignedDoctor' in the Patient model)
+//         const patients = await Patient.find({ assignedDoctor: doctor._id }).populate('user', 'name email');
+
+//         // Respond with doctor info and patients assigned to the doctor
+//         res.status(200).json({ doctor, patients });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// }
+
 export async function getDoctorDashboard(req, res) {
     try {
-        // Use req.user._id since the doctor is authenticated, and we attach the user to the request
-        const doctor = await Doctor.findOne({user: req.user._id}).populate('patients');
+        // Find the doctor by the authenticated user's ID
+        const doctor = await Doctor.findOne({ user: req.user._id })
+            .populate({
+                path: 'patients',
+                populate: { path: 'user', select: 'name email' } // Populate user details for each patient
+            })
+            .populate('user', 'name email gender'); // Populate the doctor's user details
 
         if (!doctor) {
             return res.status(404).json({ message: "Doctor not found" });
         }
 
-        // Find all patients assigned to this doctor (assuming you have 'assignedDoctor' in the Patient model)
-        const patients = await Patient.find({ assignedDoctor: doctor._id }).populate('user', 'name email');
-
-        // Respond with doctor info and patients assigned to the doctor
-        res.status(200).json({ doctor, patients });
+        // Respond with the populated doctor object
+        res.status(200).json({ doctor });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
+
 
 
 export async function addPatientNotes(req, res) {
