@@ -73,7 +73,16 @@ export async function registerUser (req, res) {
             await patient.save();
 
             // Update the Doctor's patients field with the new patient's ID
-            doctor.patients.push(patient._id);
+            //doctor.patients.push(patient._id);
+
+            doctor.patients.push({
+                _id: patient._id,
+                user: patient.user,
+                medicalHistory: patient.medicalHistory,
+                currentMedications: patient.currentMedications,
+              });
+
+
             await doctor.save();
         }
 

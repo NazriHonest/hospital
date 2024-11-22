@@ -96,6 +96,8 @@ export async function getDoctorDashboard(req, res) {
 
 
 
+
+
 export async function addPatientNotes(req, res) {
     try {
         const { notes, patientId } = req.body; // Expecting note content and patient ID in request body
