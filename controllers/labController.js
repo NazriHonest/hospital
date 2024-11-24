@@ -108,8 +108,34 @@ export async function getPatientLabResults(req, res) {
     }
 }
 
+export async function getAllPatientNotes(req, res) {
+    try {
+        // Authenticate the lab technician
+        const labTechnician = await Doctor.findOne({ user: req.user._id });
+        if (!labTechnician) {
+            return res.status(404).json({ message: "Lab Technician not found" });
+        }
+
+        // Fetch all lab tests (or notes) assigned to the lab
+        const labTests = await LabTest.find({})
+            .populate('doctorId', 'name email')
+            .populate('patientId', 'name email');
+
+        if (!labTests || labTests.length === 0) {
+            return res.status(404).json({ message: "No lab tests found" });
+        }
+
+        res.status(200).json({ labTests });
+    } catch (error) {
+        console.error("Error fetching lab tests:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
 export default {
     sendNotesToLab,
     updateLabResult,
     getPatientLabResults,
+    getAllPatientNotes,
   };

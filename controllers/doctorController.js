@@ -4,56 +4,6 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 
 
-export async function registerDoctor(req, res){
-    const { name, email, password, specialization } = req.body;
-
-    try {
-        // Check if the doctor already exists
-        let user = await Doctor.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: 'Doctor already exists' });
-        }
-
-        // Create a new doctor
-        user = new User({
-            name,
-            email,
-            password,
-            role: 'doctor',  // Ensure role is set to 'doctor'
-            specialization
-        });
-
-        new Doctor({
-            name: user.name,
-            specialization: user.specialization,
-        });
-
-        // Hash the password before saving it to the database
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
-
-        // Save the doctor to the database
-        await user.save();
-
-        // Generate a JWT token
-        const token = generateToken(user);
-
-        res.status(201).json({
-            token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                specialization: user.specialization
-            }
-        });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
 // export async function getDoctorDashboard(req, res) {
 //     try {
 //         // Use req.user._id since the doctor is authenticated, and we attach the user to the request
