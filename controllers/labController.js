@@ -9,14 +9,14 @@ export async function sendNotesToLab(req, res) {
         const { patientId, notes } = req.body; // Get patient ID and notes from the request body
         const userId = req.user._id; // Get the doctor ID from the logged-in user (via JWT token)
 
-
-        // Check if both doctor and patient exist
-        const doctor = await Doctor.findOne({user: userId});
+        // Find the doctor by user ID
+        const doctor = await Doctor.findOne({ user: userId });
         if (!doctor) {
-            console.log("Doctor not found with ID:", doctorId);
+            console.log("Doctor not found with User ID:", userId);
             return res.status(404).json({ message: 'Doctor not found' });
         }
 
+        // Find the patient by patient ID
         const patient = await Patient.findById(patientId);
         if (!patient) {
             console.log("Patient not found with ID:", patientId);
@@ -25,6 +25,7 @@ export async function sendNotesToLab(req, res) {
 
         // Ensure the doctor is assigned to this patient
         if (patient.assignedDoctor.toString() !== doctor._id.toString()) {
+            console.log("Doctor is not assigned to the patient with ID:", patientId);
             return res.status(403).json({ message: 'Doctor is not assigned to this patient' });
         }
 
@@ -32,15 +33,19 @@ export async function sendNotesToLab(req, res) {
         const labTest = new LabTest({
             doctorId: doctor._id,
             patientId: patient._id,
-            notes: notes
+            notes: notes,
+            createdAt: new Date(),
         });
 
         // Save the lab test
         await labTest.save();
 
+        // Add additional log for success
+        console.log("Lab test successfully created:", labTest);
+
         res.status(200).json({ message: 'Notes sent to lab for examination', labTest });
     } catch (error) {
-        console.error("Error:", error.message);
+        console.error("Error sending notes to lab:", error.message);
         res.status(500).json({ error: error.message });
     }
 }

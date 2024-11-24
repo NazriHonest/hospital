@@ -7,7 +7,7 @@ import { authenticate } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Route for doctors to send notes to lab for a patient
-router.post('/send', authenticate(['doctor']), sendNotesToLab);
+router.post('/send-notes', authenticate(['doctor']), sendNotesToLab);
 
 // Route for labs to update the result of a test
 router.put('/result/:testId', authenticate(['lab']), updateLabResult);
