@@ -77,6 +77,36 @@ export async function updateLabResult(req, res) {
     }
 }
 
+
+export const sendLabResults = async (req, res) => {
+    try {
+        const { labTestId, results } = req.body; // Expecting lab test ID and results in request body
+
+        // Find the lab test by ID
+        const labTest = await LabTest.findById(labTestId);
+        if (!labTest) {
+            return res.status(404).json({ message: "Lab test not found" });
+        }
+
+        // Update the lab test with the results
+        labTest.results = results;
+        labTest.status = 'Completed'; // Optionally, update the status to completed
+        await labTest.save();
+
+        // Optionally, notify the doctor (e.g., via a notification system)
+        const doctor = await Doctor.findById(labTest.doctorId);
+        if (doctor) {
+            // You can push this result into a "notifications" field in the doctor's model if implemented
+            console.log(`Doctor ${doctor._id} has been notified about lab results.`);
+        }
+
+        res.status(200).json({ message: "Lab results sent successfully", labTest });
+    } catch (error) {
+        console.error("Error sending lab results:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Controller to retrieve lab results for a specific patient
 export async function getPatientLabResults(req, res) {
     try {
