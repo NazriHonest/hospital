@@ -57,7 +57,7 @@ export async function registerUser (req, res) {
                 return res.status(400).json({ message: 'Assigned doctor is required for patients.' });
             }
 
-            const doctor = await Doctor.findById(assignedDoctor);
+            const doctor = await Doctor.findById(assignedDoctor).populate('patients');
             if (!doctor) {
                 return res.status(404).json({ message: 'Assigned doctor not found.' });
             }
